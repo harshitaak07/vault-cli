@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
+	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 )
 
 func DynamoClient() (*dynamodb.Client, error) {
@@ -25,13 +26,13 @@ func RecordFileToDynamo(fileName, hash string, size int64, mode, location string
 	}
 	_, err = client.PutItem(context.TODO(), &dynamodb.PutItemInput{
 		TableName: aws.String("VaultMetadata"),
-		Item: map[string]dynamodb.AttributeValue{
-			"FileName":   &dynamodb.AttributeValueMemberS{Value: fileName},
-			"UploadedAt": &dynamodb.AttributeValueMemberS{Value: time.Now().UTC().Format(time.RFC3339)},
-			"Hash":       &dynamodb.AttributeValueMemberS{Value: hash},
-			"Size":       &dynamodb.AttributeValueMemberN{Value: fmt.Sprintf("%d", size)},
-			"Mode":       &dynamodb.AttributeValueMemberS{Value: mode},
-			"Location":   &dynamodb.AttributeValueMemberS{Value: location},
+		Item: map[string]types.AttributeValue{
+			"FileName":   &types.AttributeValueMemberS{Value: fileName},
+			"UploadedAt": &types.AttributeValueMemberS{Value: time.Now().UTC().Format(time.RFC3339)},
+			"Hash":       &types.AttributeValueMemberS{Value: hash},
+			"Size":       &types.AttributeValueMemberN{Value: fmt.Sprintf("%d", size)},
+			"Mode":       &types.AttributeValueMemberS{Value: mode},
+			"Location":   &types.AttributeValueMemberS{Value: location},
 		},
 	})
 	return err
@@ -44,15 +45,18 @@ func RecordAuditToDynamo(action, filename, target string, success bool, errMsg s
 	}
 	_, err = client.PutItem(context.TODO(), &dynamodb.PutItemInput{
 		TableName: aws.String("VaultAudit"),
-		Item: map[string]dynamodb.AttributeValue{
-			"ActionID": &dynamodb.AttributeValueMemberS{Value: fmt.Sprintf("%s-%d", action, time.Now().UnixNano())},
-			"Action":   &dynamodb.AttributeValueMemberS{Value: action},
-			"FileName": &dynamodb.AttributeValueMemberS{Value: filename},
-			"Target":   &dynamodb.AttributeValueMemberS{Value: target},
-			"Success":  &dynamodb.AttributeValueMemberBOOL{Value: success},
-			"Error":    &dynamodb.AttributeValueMemberS{Value: errMsg},
-			"TS":       &dynamodb.AttributeValueMemberS{Value: time.Now().UTC().Format(time.RFC3339)},
+		Item: map[string]types.AttributeValue{
+			"ActionID": &types.AttributeValueMemberS{
+				Value: fmt.Sprintf("%s-%d", action, time.Now().UnixNano()),
+			},
+			"Action":   &types.AttributeValueMemberS{Value: action},
+			"FileName": &types.AttributeValueMemberS{Value: filename},
+			"Target":   &types.AttributeValueMemberS{Value: target},
+			"Success":  &types.AttributeValueMemberBOOL{Value: success},
+			"Error":    &types.AttributeValueMemberS{Value: errMsg},
+			"TS":       &types.AttributeValueMemberS{Value: time.Now().UTC().Format(time.RFC3339)},
 		},
 	})
 	return err
 }
+

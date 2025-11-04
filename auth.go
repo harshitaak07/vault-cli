@@ -2,12 +2,11 @@ package main
 
 import (
 	"bufio"
-	"crypto/sha256"
-	"encoding/hex"
 	"fmt"
 	"os"
 	"strings"
 
+	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/term"
 )
 
@@ -23,8 +22,7 @@ func VerifyPassword(passFile string) bool {
 	} else {
 		reader := bufio.NewReader(os.Stdin)
 		input, _ := reader.ReadString('\n')
-		input = strings.TrimSpace(input)
-		pw = []byte(input)
+		pw = []byte(strings.TrimSpace(input))
 	}
 
 	if err != nil {
@@ -32,12 +30,12 @@ func VerifyPassword(passFile string) bool {
 		return false
 	}
 
-	h := sha256.Sum256(pw)
-	expected, err := os.ReadFile(passFile)
+	hashBytes, err := os.ReadFile(passFile)
 	if err != nil {
 		fmt.Println("error reading password file:", err)
 		return false
 	}
 
-	return hex.EncodeToString(h[:]) == strings.TrimSpace(string(expected))
+	err = bcrypt.CompareHashAndPassword(hashBytes, pw)
+	return err == nil
 }

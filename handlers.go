@@ -10,7 +10,12 @@ func UploadHandler(file string, cfg *Config, db *sql.DB) error {
 	if cfg.Mode == "local" {
 		return LocalUpload(file)
 	}
-	return EncryptAndUpload(file, cfg, db)
+	err := EncryptAndUpload(file, cfg, db)
+	if err != nil {
+		return fmt.Errorf("upload failed: %w", err)
+	}
+	_ = LogToCloudWatch(fmt.Sprintf("File uploaded: %s", file))
+	return nil
 }
 
 func DownloadHandler(file string, cfg *Config, db *sql.DB) error {

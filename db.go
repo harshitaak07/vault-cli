@@ -13,26 +13,32 @@ func OpenDB(path string) (*sql.DB, error) {
 }
 
 func InitDB(db *sql.DB) error {
-	_, err := db.Exec(`CREATE TABLE IF NOT EXISTS files (
-		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		filename TEXT,
-		uploaded_at TEXT,
-		hash TEXT,
-		size INTEGER,
-		location TEXT,
-		mode TEXT
-	);
-	CREATE TABLE IF NOT EXISTS audit (
-		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		action TEXT,
-		filename TEXT,
-		target TEXT,
-		success INTEGER,
-		err TEXT,
-		ts TEXT
-	);
-	`)
-	return err
+	stmts := []string{
+		`CREATE TABLE IF NOT EXISTS files (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			filename TEXT,
+			uploaded_at TEXT,
+			hash TEXT,
+			size INTEGER,
+			location TEXT,
+			mode TEXT
+		);`,
+		`CREATE TABLE IF NOT EXISTS audit (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			action TEXT,
+			filename TEXT,
+			target TEXT,
+			success INTEGER,
+			err TEXT,
+			ts TEXT
+		);`,
+	}
+	for _, s := range stmts {
+		if _, err := db.Exec(s); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func RecordFile(db *sql.DB, filename, hash string, size int64, location, mode string) error {
@@ -67,7 +73,7 @@ func PrintDBEntries(db *sql.DB) error {
 		}
 		fmt.Printf("%d %s %s %s %d %s %s\n", id, fn, ts, hash, size, loc, mode)
 	}
-	return nil
+	return rows.Err() 
 }
 
 func PrintAudit(db *sql.DB) error {

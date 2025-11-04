@@ -19,6 +19,8 @@ Commands:
   local-download <file>    Retrieve file from local vault
   list                     List local DB entries
   audit                    Show audit log (DB)
+  report                   Show summary report (file count, total size)
+
 `)
 }
 
@@ -102,6 +104,8 @@ func main() {
 		if err := PrintAudit(db); err != nil {
 			log.Fatalf("audit: %v", err)
 		}
+	case "report":
+		GenerateReport(db)
 
 	default:
 		usage()

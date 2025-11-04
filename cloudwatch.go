@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
+	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs/types"
 )
 
 func LogToCloudWatch(message string) error {
@@ -24,11 +25,11 @@ func LogToCloudWatch(message string) error {
 		LogStreamName: &logStream,
 	})
 
-	ts := time.Now().UnixNano() / int64(time.Millisecond)
+	ts := time.Now().UnixMilli()
 	_, err = svc.PutLogEvents(context.TODO(), &cloudwatchlogs.PutLogEventsInput{
 		LogGroupName:  &logGroup,
 		LogStreamName: &logStream,
-		LogEvents: []cloudwatchlogs.types.InputLogEvent{
+		LogEvents: []types.InputLogEvent{
 			{
 				Message:   aws.String(message),
 				Timestamp: aws.Int64(ts),
