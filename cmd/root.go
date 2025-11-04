@@ -57,3 +57,15 @@ func CloseDB() {
 		_ = database.Close()
 	}
 }
+
+func init() {
+	rootCmd.AddCommand(
+		loginCmd,
+		logoutCmd,
+		addSecretCmd,
+		getSecretCmd,
+		listSecretsCmd,
+		deleteSecretCmd,
+		rotateKeysCmd,
+	)
+}

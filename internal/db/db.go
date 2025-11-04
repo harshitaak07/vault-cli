@@ -23,6 +23,7 @@ func InitDB(db *sql.DB) error {
 			location TEXT,
 			mode TEXT
 		);`,
+
 		`CREATE TABLE IF NOT EXISTS audit (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
 			action TEXT,
@@ -32,12 +33,28 @@ func InitDB(db *sql.DB) error {
 			err TEXT,
 			ts TEXT
 		);`,
+
+		`CREATE TABLE IF NOT EXISTS secrets (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			category TEXT NOT NULL,
+			name TEXT NOT NULL,
+			ciphertext BLOB NOT NULL,
+			nonce BLOB NOT NULL,
+			mode TEXT NOT NULL,
+			hash TEXT NOT NULL,
+			created_at TEXT NOT NULL,
+			updated_at TEXT NOT NULL,
+			UNIQUE(category, name)
+		);`,
 	}
+
 	for _, s := range stmts {
 		if _, err := db.Exec(s); err != nil {
-			return err
+			return fmt.Errorf("InitDB failed: %v", err)
 		}
 	}
+
+	fmt.Println("✅ Database initialized with tables: files, audit, secrets")
 	return nil
 }
 

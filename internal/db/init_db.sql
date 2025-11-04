@@ -17,5 +17,20 @@ CREATE TABLE IF NOT EXISTS audit (
   err TEXT,
   ts TEXT
 );
+
+CREATE TABLE IF NOT EXISTS secrets (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  category TEXT NOT NULL,
+  name TEXT NOT NULL,
+  ciphertext BLOB NOT NULL,
+  nonce BLOB NOT NULL,
+  mode TEXT NOT NULL,          
+  hash TEXT NOT NULL,          
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  UNIQUE(category, name)
+);
+
+
 RecordFileToDynamo(keyName, hash, info.Size(), cfg.Mode, "s3")
 RecordAuditToDynamo("upload", keyName, "s3", true, "")
