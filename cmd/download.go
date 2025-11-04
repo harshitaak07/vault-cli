@@ -18,7 +18,7 @@ var downloadCmd = &cobra.Command{
 		if err := core.DownloadHandler(file, cfg, database); err != nil {
 			log.Fatalf("download failed: %v", err)
 		}
-		fmt.Println("✅ File downloaded successfully.")
+		fmt.Println("File downloaded successfully.")
 	},
 }
 

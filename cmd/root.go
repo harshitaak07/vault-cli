@@ -21,7 +21,6 @@ var (
 		Long: `Vault CLI allows you to encrypt, upload, download, and manage files securely
 using AWS KMS, S3, and DynamoDB or local vault mode.`,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-			// Load environment
 			_ = godotenv.Load(".env")
 
 			var err error
@@ -38,7 +37,6 @@ using AWS KMS, S3, and DynamoDB or local vault mode.`,
 				return err
 			}
 
-			// Password verification (only once)
 			if cfg.RequirePassword {
 				if ok := auth.VerifyPassword(cfg.PasswordFile); !ok {
 					log.Fatal("Access denied: wrong password")

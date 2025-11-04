@@ -18,7 +18,7 @@ var localDownloadCmd = &cobra.Command{
 		if err := local.LocalDownload(file); err != nil {
 			log.Fatalf("local download failed: %v", err)
 		}
-		fmt.Println("✅ Local download successful.")
+		fmt.Println("Local download successful.")
 	},
 }
 

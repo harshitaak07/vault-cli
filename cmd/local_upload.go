@@ -18,7 +18,7 @@ var localUploadCmd = &cobra.Command{
 		if err := local.LocalUpload(file); err != nil {
 			log.Fatalf("local upload failed: %v", err)
 		}
-		fmt.Println("✅ Local upload successful.")
+		fmt.Println("Local upload successful.")
 	},
 }
 
