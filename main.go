@@ -6,6 +6,12 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
+
+	"vault-cli/internal/auth"
+	"vault-cli/internal/config"
+	"vault-cli/internal/core"
+	"vault-cli/internal/db"
+	"vault-cli/internal/local"
 )
 
 func usage() {
@@ -27,23 +33,23 @@ Commands:
 func main() {
 	godotenv.Load(".env")
 	_ = os.Setenv("GOCACHE", os.Getenv("GOCACHE"))
-	cfg, err := LoadConfig()
+	cfg, err := config.LoadConfig()
 	if err != nil {
 		log.Fatalf("config: %v", err)
 	}
 
-	db, err := OpenDB(cfg.DBPath)
+	database, err := db.OpenDB(cfg.DBPath)
 	if err != nil {
 		log.Fatalf("db open: %v", err)
 	}
-	defer db.Close()
+	defer database.Close()
 
-	if err := InitDB(db); err != nil {
+	if err := db.InitDB(database); err != nil {
 		log.Fatalf("db init: %v", err)
 	}
 
 	if cfg.RequirePassword {
-		if ok := VerifyPassword(cfg.PasswordFile); !ok {
+		if ok := auth.VerifyPassword(cfg.PasswordFile); !ok {
 			log.Fatal("access denied: wrong password")
 		}
 	}
@@ -60,7 +66,7 @@ func main() {
 			log.Fatal("upload requires a file path")
 		}
 		file := os.Args[2]
-		if err := UploadHandler(file, cfg, db); err != nil {
+		if err := core.UploadHandler(file, cfg, database); err != nil {
 			log.Fatalf("upload: %v", err)
 		}
 		fmt.Println("uploaded")
@@ -70,7 +76,7 @@ func main() {
 			log.Fatal("download requires a file name")
 		}
 		file := os.Args[2]
-		if err := DownloadHandler(file, cfg, db); err != nil {
+		if err := core.DownloadHandler(file, cfg, database); err != nil {
 			log.Fatalf("download: %v", err)
 		}
 		fmt.Println("downloaded")
@@ -80,7 +86,7 @@ func main() {
 			log.Fatal("local-upload requires a file path")
 		}
 		file := os.Args[2]
-		if err := LocalUpload(file); err != nil {
+		if err := local.LocalUpload(file); err != nil {
 			log.Fatalf("local-upload: %v", err)
 		}
 		fmt.Println("local uploaded")
@@ -90,22 +96,22 @@ func main() {
 			log.Fatal("local-download requires a file name")
 		}
 		file := os.Args[2]
-		if err := LocalDownload(file); err != nil {
+		if err := local.LocalDownload(file); err != nil {
 			log.Fatalf("local-download: %v", err)
 		}
 		fmt.Println("local downloaded")
 
 	case "list":
-		if err := PrintDBEntries(db); err != nil {
+		if err := db.PrintDBEntries(database); err != nil {
 			log.Fatalf("list: %v", err)
 		}
 
 	case "audit":
-		if err := PrintAudit(db); err != nil {
+		if err := db.PrintAudit(database); err != nil {
 			log.Fatalf("audit: %v", err)
 		}
 	case "report":
-		GenerateReport(db)
+		core.GenerateReport(database)
 
 	default:
 		usage()
