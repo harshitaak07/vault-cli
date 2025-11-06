@@ -20,7 +20,7 @@ var loginCmd = &cobra.Command{
 		if err := session.Save("admin", 15*time.Minute); err != nil {
 			return err
 		}
-		fmt.Println("✅ Session started (15m).")
+		fmt.Println("Session started (15m).")
 		return nil
 	},
 }

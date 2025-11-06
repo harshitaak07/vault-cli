@@ -54,7 +54,7 @@ func InitDB(db *sql.DB) error {
 		}
 	}
 
-	fmt.Println("✅ Database initialized with tables: files, audit, secrets")
+	fmt.Println("Database initialized with tables: files, audit, secrets")
 	return nil
 }
 

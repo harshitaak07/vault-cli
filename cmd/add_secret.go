@@ -21,7 +21,7 @@ var addSecretCmd = &cobra.Command{
 		if err := secrets.Add(database, cfg, s); err != nil {
 			return fmt.Errorf("add-secret: %w", err)
 		}
-		fmt.Println("🔒 Secret stored.")
+		fmt.Println("Secret stored.")
 		return nil
 	},
 }

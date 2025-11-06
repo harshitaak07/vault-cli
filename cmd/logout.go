@@ -13,7 +13,7 @@ var logoutCmd = &cobra.Command{
 	Short: "End the current session",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		_ = session.Clear()
-		fmt.Println("👋 Logged out.")
+		fmt.Println("Logged out.")
 		return nil
 	},
 }

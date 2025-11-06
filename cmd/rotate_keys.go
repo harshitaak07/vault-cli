@@ -20,7 +20,7 @@ var rotateKeysCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		fmt.Printf("🔁 Rotated %d secrets.\n", n)
+		fmt.Printf("Rotated %d secrets.\n", n)
 		return nil
 	},
 }
