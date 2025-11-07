@@ -16,6 +16,22 @@ go mod tidy
 go build -o vault
 ./vault upload secret.txt
 
+## web ui
+
+Start the HTTP server (serves the API and static frontend):
+
+```
+go run . server --addr 127.0.0.1:8080
+```
+
+or, after building the binary:
+
+```
+./vault server --addr 127.0.0.1:8080
+```
+
+The dashboard is available at `http://127.0.0.1:8080/` and exposes the same upload/download and secrets functionality as the CLI. If `VAULT_REQUIRE_PASSWORD=1`, authenticate through the login form with the master password before using the UI.
+
 ## docker
 
 docker build -t vault-cli .

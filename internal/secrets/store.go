@@ -19,6 +19,8 @@ type Secret struct {
 	Category string
 	Name     string
 	Value    string
+    CreatedAt string
+    UpdatedAt string
 }
 
 func Add(database *sql.DB, cfg *config.Config, s Secret) error {
@@ -129,7 +131,7 @@ func Get(database *sql.DB, cfg *config.Config, category, name string) (string, e
 }
 
 func List(database *sql.DB, category string) ([]Secret, error) {
-	q := `SELECT category, name FROM secrets`
+    q := `SELECT category, name, created_at, updated_at FROM secrets`
 	args := []any{}
 	if category != "" {
 		q += ` WHERE category=?`
@@ -143,12 +145,12 @@ func List(database *sql.DB, category string) ([]Secret, error) {
 	defer rows.Close()
 
 	var out []Secret
-	for rows.Next() {
-		var c, n string
-		if err := rows.Scan(&c, &n); err != nil {
+    for rows.Next() {
+        var c, n, created, updated string
+        if err := rows.Scan(&c, &n, &created, &updated); err != nil {
 			return nil, err
 		}
-		out = append(out, Secret{Category: c, Name: n})
+        out = append(out, Secret{Category: c, Name: n, CreatedAt: created, UpdatedAt: updated})
 	}
 	return out, rows.Err()
 }

@@ -1,13 +1,14 @@
 package auth
 
 import (
-	"bufio"
-	"fmt"
-	"os"
-	"strings"
+    "bufio"
+    "errors"
+    "fmt"
+    "os"
+    "strings"
 
-	"golang.org/x/crypto/bcrypt"
-	"golang.org/x/term"
+    "golang.org/x/crypto/bcrypt"
+    "golang.org/x/term"
 )
 
 func VerifyPassword(passFile string) bool {
@@ -30,12 +31,31 @@ func VerifyPassword(passFile string) bool {
 		return false
 	}
 
-	hashBytes, err := os.ReadFile(passFile)
-	if err != nil {
-		fmt.Println("error reading password file:", err)
-		return false
-	}
+    ok, err := CheckPassword(passFile, string(pw))
+    if err != nil {
+        fmt.Println("error verifying password:", err)
+        return false
+    }
+    return ok
+}
 
-	err = bcrypt.CompareHashAndPassword(hashBytes, pw)
-	return err == nil
+func CheckPassword(passFile, password string) (bool, error) {
+    password = strings.TrimSpace(password)
+    if password == "" {
+        return false, nil
+    }
+    if strings.TrimSpace(passFile) == "" {
+        return false, errors.New("password file not configured")
+    }
+    hashBytes, err := os.ReadFile(passFile)
+    if err != nil {
+        return false, fmt.Errorf("read password file: %w", err)
+    }
+    if err := bcrypt.CompareHashAndPassword(hashBytes, []byte(password)); err != nil {
+        if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
+            return false, nil
+        }
+        return false, err
+    }
+    return true, nil
 }
